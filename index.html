@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La traversée</title>
+<!-- Pas d'icône de site pour l'instant : évite une requête favicon.ico en erreur dans la console -->
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<!-- data-view : « page » (fenêtre 8:9, une page) ou « spread » (fenêtre 16:9, la double page), posé par main.js -->
+<body data-view="spread">
+
+<div class="app">
+
+  <header class="top">
+    <!-- Localisation : bascule FR / EN -->
+    <button type="button" id="lang" class="lang"><span id="langCode">FR</span></button>
+    <!-- Titre du moment clé courant -->
+    <h1 id="momentTitle" class="moment-title"></h1>
+    <!-- Onglet vertical du Menu -->
+    <button type="button" id="menuTab" class="menu-tab" aria-haspopup="dialog">
+      <span class="icon icon-menu" aria-hidden="true"></span><span id="menuTabLabel">Menu</span>
+    </button>
+  </header>
+
+  <!-- Zone de la scène : la fenêtre de la caméra s'y ajuste en gardant son ratio -->
+  <section class="stage-zone" id="stageZone">
+    <div class="window">
+      <div class="stage" id="stage"></div>
+      <!-- Miroir du texte de la double page, pour les lecteurs d'écran : invisible
+           à l'écran, lu à la demande (pas d'annonce automatique). Rempli par main.js. -->
+      <div id="pageText" class="sr-only" role="region"></div>
+      <button type="button" id="prev" class="page-btn page-prev"><span aria-hidden="true">‹</span> <span id="prevLabel">Préc.</span></button>
+      <button type="button" id="next" class="page-btn page-next"><span id="nextLabel">Suiv.</span> <span aria-hidden="true">›</span></button>
+      <!-- Zoom : seulement en vue double page -->
+      <div class="zoom" id="zoom" role="group">
+        <button type="button" id="zoomOut" class="icon-btn"><span class="icon icon-zoom-out" aria-hidden="true"></span></button>
+        <button type="button" id="zoomFit" class="icon-btn"><span class="icon icon-zoom-fit" aria-hidden="true"></span></button>
+        <button type="button" id="zoomIn" class="icon-btn"><span class="icon icon-zoom-in" aria-hidden="true"></span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Progression : lecture/pause et numéro de page (S#2-02) ; curseur avec repères et temps sous ?debug seulement (S#2-01) -->
+  <div class="progress">
+    <button type="button" id="play" class="icon-btn"><span id="playIcon" class="icon icon-play" aria-hidden="true"></span></button>
+    <output id="pageNum" class="page-num"></output>
+    <div class="scrub">
+      <label class="sr-only" for="seek" id="seekLabel">Position dans l’animation, en secondes</label>
+      <input type="range" id="seek" min="0" max="20" step="0.01" value="0">
+      <div class="ticks" id="ticks" aria-hidden="true"></div>
+    </div>
+    <output id="time" class="time" for="seek">00:00.0</output>
+  </div>
+
+</div>
+
+<!-- Menu : pages, affichage, son, export PDF, version -->
+<dialog id="menu" class="menu" aria-labelledby="menuTitle">
+  <div class="menu-head">
+    <h2 id="menuTitle">Menu</h2>
+    <button type="button" id="menuClose" class="icon-btn"><span class="icon icon-close" aria-hidden="true"></span></button>
+  </div>
+
+  <h3 id="momentsTitle">Moments clés</h3>
+  <ol class="moments" id="moments"></ol>
+
+  <!-- Vue du lecteur : une page ou la double page (mémorisé) -->
+  <h3 id="viewTitle">Affichage</h3>
+  <div class="view-switch" role="group" aria-labelledby="viewTitle">
+    <button type="button" id="viewPage" class="btn" aria-pressed="false">Page</button>
+    <button type="button" id="viewSpread" class="btn" aria-pressed="false">Double page</button>
+  </div>
+
+  <h3 id="soundTitle">Son</h3>
+  <button type="button" id="mute" class="btn" aria-pressed="false">
+    <span id="muteIcon" class="icon icon-sound-on" aria-hidden="true"></span><span id="muteLabel">Son actif</span>
+  </button>
+
+  <h3 id="exportTitle">Export PDF</h3>
+  <p id="exportHint" class="hint"></p>
+  <button type="button" id="export" class="btn btn-primary"></button>
+  <p id="exportStatus" class="status" role="status"></p>
+
+  <p id="version" class="version"></p>
+</dialog>
+
+<!-- Sous ?debug : la console recopiée à l'écran (téléphone), chargé en premier -->
+<script src="js/journal.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/8.13.2/pixi.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/PixiPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.3/jspdf.umd.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/book.js"></script>
+<script src="js/spreads.js"></script>
+<script src="js/blocks.js"></script>
+<script src="ts/fr/ui.js"></script>
+<script src="ts/en/ui.js"></script>
+<script src="js/lang.js"></script>
+<script src="ts/fr/book.js"></script>
+<script src="ts/en/book.js"></script>
+<script src="js/flip.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/reader.js"></script>
+<script src="js/camera.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/assets.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/pageturn.js"></script>
+<!-- Animations du livre : un script par fichier de js/anim/, avant scene.js -->
+<script src="js/anim/spaceship.js"></script>
+<script src="js/anim/drop.js"></script>
+<script src="js/anim/oppy_dp09.js"></script>
+<script src="js/anim/discovery.js"></script>
+<script src="js/anim/asteroid.js"></script>
+<script src="js/scene.js"></script>
+<script src="js/timeline.js"></script>
+<script src="js/export.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
